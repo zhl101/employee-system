@@ -1,5 +1,7 @@
 <template>
     <div class="home">
+
+        <!-- 欢迎区域 -->
         <section class="welcome-card">
             <div>
                 <p>企业员工管理系统</p>
@@ -13,276 +15,465 @@
             </div>
         </section>
 
+
+        <!-- 数据统计 -->
         <div class="stats">
-            <StatCard title="员工总数" :number="totalEmployees" />
 
-            <StatCard title="在职员工" :number="activeEmployees" />
+            <StatCard
+                title="员工总数"
+                :number="employeeStore.employeeCount"
+            />
 
-            <StatCard title="离职员工" :number="inactiveEmployees" />
+            <StatCard
+                title="在职员工"
+                :number="employeeStore.activeEmployeeCount"
+            />
 
-            <StatCard title="部门数量" :number="departmentCount" />
+            <StatCard
+                title="离职员工"
+                :number="employeeStore.inactiveEmployeeCount"
+            />
+
+            <StatCard
+                title="部门数量"
+                :number="employeeStore.departmentCount"
+            />
+
         </div>
 
+
+        <!-- 部门人员概况 -->
         <section class="panel">
+
             <h3>部门人员概况</h3>
-            <p class="panel-desc">各部门当前员工人数</p>
+
+            <p class="panel-desc">
+                各部门当前员工人数
+            </p>
 
             <div class="department-list">
-                <div v-for="item in departmentStats" :key="item.name" class="department-item">
+
+                <div
+                    v-for="item in departmentStats"
+                    :key="item.name"
+                    class="department-item"
+                >
+
                     <div class="department-info">
                         <span>{{ item.name }}</span>
                         <strong>{{ item.count }} 人</strong>
                     </div>
 
                     <div class="progress">
-                        <div class="progress-inner" :style="{ width: item.percent + '%' }"></div>
+
+                        <div
+                            class="progress-inner"
+                            :style="{ width: item.percent + '%' }"
+                        ></div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </section>
 
+
+        <!-- 最近员工 -->
         <div class="employee-list">
+
             <h3>最近员工</h3>
 
-            <input v-model="searchText" type="text" placeholder="查询员工" />
+            <!-- 搜索和筛选 -->
+            <div class="search-area">
 
-            <select v-model="selectedDepartment">
-                <option value="">全部部门</option>
-                <option v-for="department in departments" :key="department.id" :value="department.name">
-                    {{ department.name }}
-                </option>
-            </select>
+                <el-input
+                    v-model="searchText"
+                    placeholder="请输入员工姓名"
+                    clearable
+                    class="search-input"
+                />
+
+                <el-select
+                    v-model="selectedDepartment"
+                    placeholder="选择部门"
+                    clearable
+                    class="department-select"
+                >
+
+                    <el-option
+                        label="全部部门"
+                        :value="''"
+                    />
+
+                    <el-option
+                        v-for="department in departments"
+                        :key="department.id"
+                        :label="department.name"
+                        :value="department.name"
+                    />
+
+                </el-select>
+
+            </div>
 
 
+            <!-- 员工表格 -->
+            <EmployeeTable
+                :employees="filteredEmployees"
+                :show-actions="false"
+            />
 
-            <EmployeeTable :employees="filteredEmployees" :show-actions="false" />
         </div>
+
     </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import StatCard from '../components/StatCard.vue'
-import EmployeeTable from '../components/EmployeeTable.vue'
-import employees, { loadEmployees } from '../data/employees'
-import departments, { loadDepartments } from '../data/departments.js'
 
+<script setup>
+
+import {
+    ref,
+    computed,
+    onMounted,
+    onUnmounted
+} from 'vue'
+
+import StatCard from '../components/StatCard.vue'
+
+import EmployeeTable from '../components/EmployeeTable.vue'
+import { useEmployeeStore } from '../stores/employee'
+import { useDepartmentStore } from '../stores/department'
+import { storeToRefs } from 'pinia'
+
+const employeeStore = useEmployeeStore()
+const { employees } = storeToRefs(employeeStore)
+const departmentStore = useDepartmentStore()
+const { departments } = storeToRefs(departmentStore)
 const currentDateTime = ref('')
+
 const updateDateTime = () => {
-    // 获取当前电脑的日期和时间
+
     const now = new Date()
 
-    currentDateTime.value = now.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    })
-}
-onUnmounted(() => {
-    clearInterval(timer)
-})
-let timer = null
-onMounted(async () => {
-    // 加载数据库中的员工数据
-    await loadEmployees()
+    currentDateTime.value = now.toLocaleString(
+        'zh-CN',
+        {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        }
+    )
 
-    await loadDepartments()
+}
+
+
+let timer = null
+
+onMounted(async () => {
+
+    // 获取员工数据
+    await employeeStore.loadEmployees()
+
+    // 获取部门数据
+    await departmentStore.loadDepartments()
 
     // 更新时间
     updateDateTime()
 
     timer = setInterval(() => {
+
         updateDateTime()
+
     }, 1000)
+
 })
+
+
+onUnmounted(() => {
+
+    clearInterval(timer)
+
+})
+
+
 const searchText = ref('')
+
 const selectedDepartment = ref('')
 
-const filteredEmployees = computed(() => {
-    return employees.value.filter(employee => {
-        const matchName = employee.name.includes(searchText.value)
 
+const filteredEmployees = computed(() => {
+
+    return employees.value.filter(employee => {
+
+        // 姓名匹配
+        const matchName =
+            employee.name.includes(searchText.value)
+
+        // 部门匹配
         const matchDepartment =
             selectedDepartment.value === '' ||
             employee.department === selectedDepartment.value
 
         return matchName && matchDepartment
+
     })
+
 })
 
-const totalEmployees = computed(() => {
-    return employees.value.length
-})
 
-const activeEmployees = computed(() => {
-    return employees.value.filter(
-        employee => employee.status === '在职'
-    ).length
-})
-const inactiveEmployees = computed(() => {
-    return employees.value.filter(
-        employee => employee.status === '离职'
-    ).length
-})
 
-const departmentCount = computed(() => {
-    const departments = employees.value.map(
-        employee => employee.department
-    )
 
-    return new Set(departments).size
-})
+
 
 const departmentStats = computed(() => {
+
     const result = {}
 
     employees.value.forEach(employee => {
+
         if (result[employee.department]) {
+
             result[employee.department]++
+
         } else {
+
             result[employee.department] = 1
+
         }
+
     })
 
-    const max = Math.max(...Object.values(result))
 
-    return Object.entries(result).map(([name, count]) => ({
-        name,
-        count,
-        percent: Math.round((count / max) * 100)
-    }))
+    const values = Object.values(result)
+
+    if (values.length === 0) {
+        return []
+    }
+
+
+    const max = Math.max(...values)
+
+
+    return Object.entries(result).map(
+        ([name, count]) => ({
+
+            name,
+
+            count,
+
+            percent: Math.round(
+                (count / max) * 100
+            )
+
+        })
+    )
+
 })
-
-
 
 </script>
 
+
 <style scoped>
+
 .home {
     padding: 30px;
     background: #f5f6f8;
     min-height: calc(100vh - 64px);
+    box-sizing: border-box;
 }
 
-.home h2 {
-    font-size: 24px;
-    margin-top: 0;
-}
 
-.stats {
-    display: flex;
-    gap: 20px;
-}
-
-.employee-list {
-    margin-top: 30px;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-.employee-list input {
-    width: 300px;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.employee-list h3 {
-    margin-top: 0;
-}
-
-.employee-list select {
-    width: 150px;
-    padding: 10px;
-    margin-left: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
+/* =========================
+   欢迎卡片
+========================= */
 
 .welcome-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     padding: 25px 30px;
     margin-bottom: 20px;
+
     background: white;
+
     border: 1px solid #ddd;
     border-radius: 10px;
 }
 
-.welcome-card h2 {
-    margin: 8px 0;
-}
 
 .welcome-card p {
     margin: 0;
     color: #4c8bf5;
 }
 
+
+.welcome-card h2 {
+    margin: 8px 0;
+    font-size: 24px;
+}
+
+
 .welcome-card span {
     color: #888;
 }
+
+
+/* =========================
+   日期
+========================= */
 
 .welcome-date {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+
     gap: 8px;
 }
+
 
 .welcome-date strong {
     font-size: 18px;
     color: #333;
 }
 
+
+/* =========================
+   数据统计
+========================= */
+
+.stats {
+    display: flex;
+    gap: 20px;
+}
+
+
+/* =========================
+   部门概况
+========================= */
+
 .panel {
+    margin-top: 20px;
+
     background: white;
+
     padding: 20px;
+
     border: 1px solid #ddd;
     border-radius: 10px;
-    margin-bottom: 20px;
 }
+
 
 .panel h3 {
     margin: 0 0 5px;
 }
 
+
 .panel-desc {
     margin: 0 0 20px;
+
     color: #999;
+
     font-size: 13px;
 }
+
+
+/* =========================
+   部门
+========================= */
 
 .department-item {
     margin-bottom: 18px;
 }
 
+
 .department-info {
     display: flex;
+
     justify-content: space-between;
+
     margin-bottom: 8px;
 }
+
 
 .department-info strong {
     color: #555;
 }
 
+
+/* =========================
+   进度条
+========================= */
+
 .progress {
     height: 8px;
+
     background: #edf0f5;
+
     border-radius: 10px;
+
     overflow: hidden;
 }
 
+
 .progress-inner {
     height: 100%;
+
     background: #4c8bf5;
+
     border-radius: 10px;
 }
+
+
+/* =========================
+   员工列表
+========================= */
+
+.employee-list {
+    margin-top: 30px;
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 8px;
+
+    border: 1px solid #ddd;
+}
+
+
+.employee-list h3 {
+    margin-top: 0;
+}
+
+
+/* =========================
+   搜索区域
+========================= */
+
+.search-area {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+
+.search-input {
+    width: 300px;
+}
+
+
+.department-select {
+    width: 180px;
+}
+
 </style>

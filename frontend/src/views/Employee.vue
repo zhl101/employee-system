@@ -5,88 +5,99 @@
 
         <div class="employee-list">
             <div class="filters">
-                <input v-model="searchText" type="text" placeholder="查询员工" />
+                <el-input v-model="searchText" placeholder="查询员工" style="width: 220px" />
 
-                <select v-model="selectedDepartment">
-                    <option value="">全部部门</option>
-                    <option v-for="department in departments" :key="department.id" :value="department.name">
+                <el-select v-model="selectedDepartment" placeholder="请选择部门" style="width: 180px">
+                    <el-option label="全部部门" :value="''">全部部门</el-option>
+                    <el-option v-for="department in departments" :key="department.id" :value="department.name">
                         {{ department.name }}
-                    </option>
-                </select>
+                    </el-option>
+                </el-select>
 
-                <button class="add-btn" @click="showForm = true">
+                <el-button type="primary" @click="showForm = true">
                     新增员工
-                </button>
+                </el-button>
             </div>
 
             <div v-if="showForm" class="form">
-                <input v-model="newEmployee.name" type="text" placeholder="员工姓名" />
-                <select v-model="newEmployee.department">
-                    <option value="">请选择部门</option>
+                <h3>新增员工</h3>
 
-                    <option v-for="department in departments" :key="department.id" :value="department.name">
-                        {{ department.name }}
-                    </option>
-                </select>
+                <el-input v-model="newEmployee.name" placeholder="请输入员工姓名" style="width: 220px" />
 
+                <el-select v-model="newEmployee.department" placeholder="请选择部门" style="width: 180px">
+                    <el-option v-for="department in departments" :key="department.id" :label="department.name"
+                        :value="department.name" />
+                </el-select>
 
-                <input v-model="newEmployee.position" type="text" placeholder="员工职位" />
+                <el-input v-model="newEmployee.position" placeholder="请输入员工职位" style="width: 220px" />
 
-                <select v-model="newEmployee.status">
-                    <option value="在职">在职</option>
-                    <option value="离职">离职</option>
-                </select>
+                <el-select v-model="newEmployee.status" placeholder="请选择状态" style="width: 150px">
+                    <el-option label="在职" value="在职" />
+                    <el-option label="离职" value="离职" />
+                </el-select>
 
-                <button @click="addEmployee">保存</button>
-                <button @click="cancelAdd">取消</button>
+                <div class="form-buttons">
+                    <el-button type="primary" @click="addEmployee">
+                        保存
+                    </el-button>
+
+                    <el-button @click="cancelAdd">
+                        取消
+                    </el-button>
+                </div>
             </div>
+            <div v-if="showEditForm" class="form">
+                <h3>编辑员工</h3>
 
-            <div v-if="showEditForm" class="add-form">
-                <h4>编辑员工</h4>
+                <el-input v-model="editEmployeeData.name" placeholder="请输入员工姓名" style="width: 220px" />
 
-                <input v-model="editEmployeeData.name" type="text" placeholder="请输入姓名">
+                <el-select v-model="editEmployeeData.department" placeholder="请选择部门" style="width: 180px">
+                    <el-option v-for="department in departments" :key="department.id" :label="department.name"
+                        :value="department.name" />
+                </el-select>
 
-                <select v-model="editEmployeeData.department">
-                    <option value="">请选择部门</option>
-                    <option v-for="department in departments" :key="department.id" :value="department.name">
-                        {{ department.name }}
-                    </option>
-                </select>
+                <el-input v-model="editEmployeeData.position" placeholder="请输入员工职位" style="width: 220px" />
 
-                <input v-model="editEmployeeData.position" type="text" placeholder="请输入职位">
+                <el-select v-model="editEmployeeData.status" placeholder="请选择状态" style="width: 150px">
+                    <el-option label="在职" value="在职" />
+                    <el-option label="离职" value="离职" />
+                </el-select>
 
-                <select v-model="editEmployeeData.status">
-                    <option value="在职">在职</option>
-                    <option value="离职">离职</option>
-                </select>
+                <div class="form-buttons">
+                    <el-button type="primary" @click="saveEdit">
+                        保存修改
+                    </el-button>
 
-                <button @click="saveEdit">
-                    保存修改
-                </button>
-
-                <button @click="showEditForm = false">
-                    取消
-                </button>
+                    <el-button @click="showEditForm = false">
+                        取消
+                    </el-button>
+                </div>
             </div>
 
             <EmployeeTable :employees="filteredEmployees" @edit="editEmployee" @delete="deleteEmployee"
-                @toggle-status="toggleStatus" />
+               />
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
-import EmployeeTable from '../components/EmployeeTable.vue'
-import employees, { loadEmployees } from '../data/employees'
-import departments, { loadDepartments } from '../data/departments'
 
+import { ref, computed, onMounted } from 'vue'
+import EmployeeTable from '../components/EmployeeTable.vue'
+import { useEmployeeStore } from '../stores/employee.js'
+import { storeToRefs } from 'pinia'
+import { useDepartmentStore } from '../stores/department'
+
+
+const employeeStore = useEmployeeStore()
+const { employees } = storeToRefs(employeeStore)
+const departmentStore = useDepartmentStore()
+const { departments } = storeToRefs(departmentStore)
 const showForm = ref(false)
 const showEditForm = ref(false)
 onMounted(async () => {
-    await loadEmployees()
-    await loadDepartments()
+    await employeeStore.loadEmployees()
+    await departmentStore.loadDepartments()
 })
 const editEmployeeData = ref({
     id: null,
@@ -120,11 +131,7 @@ const addEmployee = async () => {
     }
 
     try {
-        const res = await axios.post('http://localhost:3000/api/employees', newEmployee.value)
-        console.log('新增员工成功：', res.data)
-
-        // 重新获取员工数据
-        await loadEmployees()
+        await employeeStore.addEmployee(newEmployee.value)
         showForm.value = false
         newEmployee.value = {
             name: '',
@@ -133,7 +140,7 @@ const addEmployee = async () => {
             status: '在职'
         }
     } catch (err) {
-        console.error('新增员工失败：', error)
+        console.error('新增员工失败：', err)
         alert('新增员工失败')
     }
 }
@@ -183,14 +190,8 @@ const deleteEmployee = async (id) => {
     }
 
     try {
-        const res = await axios.delete(
-            `http://localhost:3000/api/employees/${id}`
-        )
-        console.log('删除员工成功：', res.data)
-
-        // 重新获取数据库中的员工数据
-        await loadEmployees()
-
+       await employeeStore.deleteEmployee(id)
+      
     } catch (err) {
         console.error('删除员工失败：', err)
         alert('删除员工失败')
@@ -214,33 +215,17 @@ const saveEdit = async () => {
 
     try {
         const id = editEmployeeData.value.id
-        const res = await axios.put(
-            `http://localhost:3000/api/employees/${id}`,
+        await employeeStore.updateEmployee(
+            id,
             editEmployeeData.value
         )
-        console.log('修改员工成功：', res.data)
-        // 重新获取数据库中的最新数据
-        await loadEmployees(
-            // 关闭编辑窗口
-            showEditForm.value = false
-        )
+        showEditForm.value = false
     } catch (error) {
         console.error('修改员工失败：', error)
         alert('修改员工失败')
     }
 }
-const toggleStatus = (id) => {
-    const employee = employees.value.find(
-        employee => employee.id === id
-    )
 
-    if (!employee) {
-        return
-    }
-
-    employee.status = employee.status === '在职' ? '离职' : '在职'
-
-}
 </script>
 
 <style scoped>
@@ -258,36 +243,12 @@ const toggleStatus = (id) => {
     border: 1px solid #ddd;
 }
 
-.employee-list input {
-    width: 300px;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.employee-list select {
-    width: 150px;
-    padding: 10px;
-    margin-left: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.add-btn {
-    padding: 8px 10px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 6px;
-    background: #1f2937;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.add-btn:hover {
-    background: #374151;
-}
 
 .form {
     margin: 20px 0;
@@ -296,16 +257,18 @@ const toggleStatus = (id) => {
     border-radius: 6px;
 }
 
-.form input,
-.form select {
-    padding: 8px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+.form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
 }
 
-.form button {
-    padding: 8px 16px;
+.form .el-input,
+.form .el-select {
     margin-right: 10px;
-    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.form-buttons {
+    margin-top: 10px;
 }
 </style>
