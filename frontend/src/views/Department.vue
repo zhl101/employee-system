@@ -1,11 +1,6 @@
 <template>
 
     <div class="department-page">
-
-        <!-- =========================
-             页面头部
-        ========================== -->
-
         <div class="page-header">
 
             <div>
@@ -27,7 +22,7 @@
                 <div class="department-count">
 
                     共
-                    <strong>{{ departments.length }}</strong>
+                    <strong>{{ departmentStore.departmentCount}}</strong>
                     个部门
 
                 </div>
@@ -43,25 +38,13 @@
 
 
             <!-- Element Plus 表格 -->
-
             <el-table :data="departments" border stripe style="width: 100%">
-
                 <!-- ID -->
-
                 <el-table-column prop="id" label="ID" width="80" />
-
-
                 <!-- 部门名称 -->
-
                 <el-table-column prop="name" label="部门名称" min-width="160" />
-
-
                 <!-- 部门描述 -->
-
                 <el-table-column prop="description" label="部门描述" min-width="300" />
-
-
-                <!-- 操作 -->
 
                 <el-table-column label="操作" width="180" fixed="right">
 
@@ -70,8 +53,6 @@
                         <el-button type="primary" link @click="editButton(scope.row)">
                             编辑
                         </el-button>
-
-
                         <el-button type="danger" link @click="deleteButton(scope.row.id)">
                             删除
                         </el-button>
@@ -84,18 +65,13 @@
 
         </div>
 
-
-        <!-- =========================
-             新增部门 Dialog
-        ========================== -->
-
         <el-dialog v-model="showForm" title="新增部门" width="420px">
 
-            <el-form>
+            <el-form ref="formRef" :model="newDepartment" :rules="rules" label-width="80px">
 
                 <!-- 部门名称 -->
 
-                <el-form-item label="部门名称">
+                <el-form-item label="部门名称" prop="name">
 
                     <el-input v-model="newDepartment.name" placeholder="请输入部门名称" />
 
@@ -104,7 +80,7 @@
 
                 <!-- 部门描述 -->
 
-                <el-form-item label="部门描述">
+                <el-form-item label="部门描述" prop="description">
 
                     <el-input v-model="newDepartment.description" type="textarea" :rows="4" placeholder="请输入部门描述" />
 
@@ -130,17 +106,13 @@
         </el-dialog>
 
 
-        <!-- =========================
-             编辑部门 Dialog
-        ========================== -->
-
         <el-dialog v-model="showEditForm" title="编辑部门" width="420px">
 
-            <el-form>
+            <el-form ref="editFormRef" :model="editDepartmentData" :rules="rules" label-width="80px">
 
                 <!-- 部门名称 -->
 
-                <el-form-item label="部门名称">
+                <el-form-item label="部门名称" prop="name">
 
                     <el-input v-model="editDepartmentData.name" placeholder="请输入部门名称" />
 
@@ -149,7 +121,7 @@
 
                 <!-- 部门描述 -->
 
-                <el-form-item label="部门描述">
+                <el-form-item label="部门描述" prop="description">
 
                     <el-input v-model="editDepartmentData.description" type="textarea" :rows="4"
                         placeholder="请输入部门描述" />
@@ -196,7 +168,21 @@ const newDepartment = ref({
     name: '',
     description: ''
 })
+const formRef=ref()
+const editFormRef=ref()
 
+const rules={
+    name:[{
+        required:true,
+        message:'请输入要部门名称',
+        trigger:'blur'//失去焦点
+    }],
+    description:[{
+        required:true,
+        message:'请输入部门描述',
+        trigger:'blur'
+    }]
+}
 
 const editDepartmentData = ref({
 
@@ -234,82 +220,42 @@ const cancelAdd = () => {
         description: ''
 
     }
+    formRef.value?.resetFields()
 
 }
 
 
 
 const addDepartment = async () => {
-
-    // 检查部门名称
-
-    if (!newDepartment.value.name.trim()) {
-
-        ElMessage.warning(
-            '请输入部门名称'
-        )
-
-        return
-
-    }
-
-
-    // 检查部门描述
-
-    if (!newDepartment.value.description.trim()) {
-
-        ElMessage.warning(
-            '请输入部门描述'
-        )
-
-        return
-
-    }
-
-
+    const valid =await formRef.value.validate()
+    if(!valid)return
     try {
-
         await departmentStore.addDepartment(
             newDepartment.value
         )
-
         // 关闭 Dialog
-
         showForm.value = false
 
-
         // 清空表单
-
         newDepartment.value = {
-
             name: '',
-
             description: ''
-
         }
 
-
         // 成功提示
-
         ElMessage.success(
             '新增部门成功'
         )
-
-
     } catch (err) {
 
         console.error(
             '新增部门失败：',
             err
         )
-
-
         console.log(
             '服务器返回：',
             err.response?.data
         )
-
-
         ElMessage.error(
             err.response?.data?.message ||
             '新增部门失败'
@@ -324,62 +270,38 @@ const addDepartment = async () => {
 const deleteButton = async (id) => {
 
     try {
-
         // Element Plus 确认框
-
         await ElMessageBox.confirm(
-
             '确定要删除这个部门吗？',
-
             '删除提示',
-
             {
                 confirmButtonText: '确定',
-
                 cancelButtonText: '取消',
-
                 type: 'warning'
-
             }
 
         )
 
-
         // 用户点击确定
         await departmentStore.deleteDepartment(id)
-
         // 成功提示
-
         ElMessage.success(
             '删除部门成功'
         )
 
-
     } catch (err) {
-
         // 点击取消也会进入 catch
         // 所以这里不直接提示删除失败
-
         if (err === 'cancel') {
-
             return
-
         }
-
-
         if (err === 'close') {
-
-            return
-
+           return
         }
-
-
         console.error(
             '删除部门失败：',
             err
         )
-
-
         ElMessage.error(
             err.response?.data?.message ||
             '删除部门失败'
@@ -426,39 +348,15 @@ const cancelEdit = () => {
         description: ''
 
     }
+    editFormRef.value?.resetFields()
 
 }
 
 
 
 const saveEdit = async () => {
-
-    // 检查部门名称
-
-    if (!editDepartmentData.value.name.trim()) {
-
-        ElMessage.warning(
-            '请输入部门名称'
-        )
-
-        return
-
-    }
-
-
-    // 检查部门描述
-
-    if (!editDepartmentData.value.description.trim()) {
-
-        ElMessage.warning(
-            '请输入部门描述'
-        )
-
-        return
-
-    }
-
-
+    const valid=await editFormRef.value.validate()
+    if(!valid)return
     try {
 
          await departmentStore.updateDepartment(

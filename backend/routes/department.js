@@ -16,6 +16,8 @@ router.get('/', (req, res) => {
     })
 })
 
+
+// 新增部门
 router.post('/', (req, res) => {
     const { name, description } = req.body
     const sql = `INSERT INTO departments (name,description) VALUES(?,?)`

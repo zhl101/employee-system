@@ -6,7 +6,12 @@ export const useDepartmentStore = defineStore('department', () => {
     // 部门数据
     const departments = ref([])
 
-   
+     // getter:部门数量
+    const departmentCount = computed(() => {
+
+        return departments.value.length
+
+    })
 
     // 获取所有部门
     async function loadDepartments() {
@@ -99,6 +104,7 @@ export const useDepartmentStore = defineStore('department', () => {
     return {
         departments,
         loadDepartments,
+        departmentCount,
         addDepartment,
         updateDepartment,
         deleteDepartment

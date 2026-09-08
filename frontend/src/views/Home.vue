@@ -36,7 +36,7 @@
 
             <StatCard
                 title="部门数量"
-                :number="employeeStore.departmentCount"
+                :number="departmentStore.departmentCount"
             />
 
         </div>
@@ -148,9 +148,11 @@ import { useDepartmentStore } from '../stores/department'
 import { storeToRefs } from 'pinia'
 
 const employeeStore = useEmployeeStore()
-const { employees } = storeToRefs(employeeStore)
 const departmentStore = useDepartmentStore()
+
+const { employees } = storeToRefs(employeeStore)
 const { departments } = storeToRefs(departmentStore)
+
 const currentDateTime = ref('')
 
 const updateDateTime = () => {

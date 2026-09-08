@@ -26,16 +26,7 @@ export const useEmployeeStore = defineStore('employee', () => {
         ).length
     })
    
- // getter:部门数量
-    const departmentCount = computed(() => {
-
-        const departmentNames = employees.value.map(
-            employee => employee.department
-        )
-
-        return new Set(departmentNames).size
-
-    })
+  
 
 
 
@@ -49,6 +40,7 @@ export const useEmployeeStore = defineStore('employee', () => {
             console.log('员工数据加载成功：', employees.value)
         } catch (err) {
             console.error('员工数据加载失败：', err)
+            throw err
         }
     }
 
@@ -107,7 +99,6 @@ export const useEmployeeStore = defineStore('employee', () => {
         employeeCount,
         activeEmployeeCount,
         inactiveEmployeeCount,
-        departmentCount,
         loadEmployees,
         addEmployee,
         updateEmployee,
