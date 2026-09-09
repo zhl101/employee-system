@@ -1,10 +1,9 @@
-<script setup>
-import Header from './components/Header.vue'
-import Sidebar from './components/Sidebar.vue'
-</script>
-
 <template>
-  <div class="app">
+
+   <!-- 登录页面 -->
+    <router-view v-if="route.path === '/login'" />
+
+  <div v-else class="app">
     <!-- 左侧菜单 -->
     <Sidebar />
     <!-- 右侧区域 -->
@@ -21,6 +20,15 @@ import Sidebar from './components/Sidebar.vue'
 
   </div>
 </template>
+
+
+<script setup>
+import Header from './components/Header.vue'
+import Sidebar from './components/Sidebar.vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+
+</script>
 
 <style>
 

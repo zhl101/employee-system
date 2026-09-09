@@ -1,25 +1,40 @@
 <template>
-  <div class="system-page">
-    <h2>系统设置</h2>
+    <div class="system">
+        <h2>系统管理</h2>
 
-    <div class="page-card">
-      <p>这里是系统设置页面</p>
+        <el-form
+            :model="systemForm"
+            label-width="100px"
+        >
+            <el-form-item label="系统名称">
+                <el-input
+                    v-model="systemForm.name"
+                    placeholder="请输入系统名称"
+                />
+            </el-form-item>
+
+            <el-form-item label="系统描述">
+                <el-input
+                    v-model="systemForm.description"
+                    type="textarea"
+                    placeholder="请输入系统描述"
+                />
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary">
+                    保存设置
+                </el-button>
+            </el-form-item>
+        </el-form>
     </div>
-  </div>
 </template>
 
-<style scoped>
-.system-page {
-  padding: 30px;
-  background: #f5f6f8;
-  min-height: calc(100vh - 64px);
-}
+<script setup>
+import { ref } from 'vue'
 
-.page-card {
-  margin-top: 30px;
-  padding: 30px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-</style>
+const systemForm = ref({
+    name: '企业员工管理系统',
+    description: '企业内部员工管理平台'
+})
+</script>

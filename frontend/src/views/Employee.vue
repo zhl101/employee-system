@@ -19,7 +19,7 @@
                 </el-button>
             </div>
 
-            <div v-if="showForm" class="form">
+            <el-dialog v-model="showForm" class="form">
                 <h3>新增员工</h3>
 
                 <el-input v-model="newEmployee.name" placeholder="请输入员工姓名" style="width: 220px" />
@@ -45,8 +45,8 @@
                         取消
                     </el-button>
                 </div>
-            </div>
-            <div v-if="showEditForm" class="form">
+            </el-dialog>
+            <el-dialog v-model="showEditForm" class="form">
                 <h3>编辑员工</h3>
 
                 <el-input v-model="editEmployeeData.name" placeholder="请输入员工姓名" style="width: 220px" />
@@ -72,7 +72,7 @@
                         取消
                     </el-button>
                 </div>
-            </div>
+            </el-dialog>
 
             <EmployeeTable :employees="filteredEmployees" @edit="editEmployee" @delete="deleteEmployee"
                />

@@ -4,11 +4,20 @@ import Employee from '../views/Employee.vue'
 import Department from '../views/Department.vue'
 import Authority from '../views/Authority.vue'
 import System from '../views/System.vue'
+import Login from '../views/Login.vue'
 
 // 挂载路由
 const routes = [
-    {
+     {
         path: '/',
+        redirect: '/login'
+    },
+    {
+        path: '/login',
+        component: Login
+    },
+    {
+        path: '/home',
         name: 'Home',
         component: Home
     },

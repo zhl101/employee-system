@@ -1,142 +1,85 @@
 <template>
 
     <aside class="sidebar">
-
-        <!-- =========================
-             Logo
-        ========================== -->
-
-        <div class="logo">
-
+       <div class="logo">
             <div class="logo-icon">
                 E
             </div>
-
             <div class="logo-text">
-
                 <h2>
                     企业管理系统
                 </h2>
-
             </div>
-
         </div>
-
-
         <div class="box">
             <span>
                 Management System
             </span>
         </div>
 
-
-        <!-- =========================
-             菜单
-        ========================== -->
-
         <nav class="menu">
-
             <p class="menu-title">
                 MENU
             </p>
 
-
-            <!-- 首页 -->
-
-            <router-link
-                to="/"
-                class="menu-item"
-            >
-
+           <!-- 首页 -->
+            <router-link to="/home" class="menu-item">
                 <el-icon class="icon">
                     <House />
                 </el-icon>
-
                 <span>
                     首页
                 </span>
-
             </router-link>
 
 
             <!-- 员工管理 -->
-
-            <router-link
-                to="/employee"
-                class="menu-item"
-            >
-
+            <router-link  v-if="hasPermission('employee')" to="/employee" class="menu-item">
                 <el-icon class="icon">
                     <User />
                 </el-icon>
-
                 <span>
                     员工管理
                 </span>
-
             </router-link>
 
 
             <!-- 部门管理 -->
-
-            <router-link
-                to="/department"
-                class="menu-item"
-            >
-
+            <router-link  v-if="hasPermission('departement')" to="/department"  class="menu-item" >
                 <el-icon class="icon">
                     <OfficeBuilding />
                 </el-icon>
-
                 <span>
                     部门管理
                 </span>
-
             </router-link>
 
 
             <!-- 系统 -->
-
             <p class="menu-title">
                 SYSTEM
             </p>
 
-
             <!-- 权限管理 -->
-
-            <router-link
-                to="/authority"
-                class="menu-item"
-            >
-
-                <el-icon class="icon">
+            <router-link  v-if="hasPermission('permission')" to="/authority" class="menu-item" >
+                 <el-icon class="icon">
                     <Lock />
                 </el-icon>
-
                 <span>
                     权限管理
                 </span>
-
             </router-link>
 
 
             <!-- 系统设置 -->
-
-            <router-link
-                to="/system"
-                class="menu-item"
-            >
-
+            <router-link  v-if="hasPermission('system')" to="/system" class="menu-item">
                 <el-icon class="icon">
                     <Setting />
                 </el-icon>
-
                 <span>
                     系统设置
                 </span>
-
             </router-link>
-
         </nav>
 
 
@@ -174,14 +117,15 @@
 
 // Element Plus 图标
 
-import {
-    House,
-    User,
-    OfficeBuilding,
-    Lock,
-    Setting
-} from '@element-plus/icons-vue'
+import { House,User, OfficeBuilding,Lock,Setting} from '@element-plus/icons-vue'
+import { useLoginStore } from '../stores/login'
+import { storeToRefs } from 'pinia'
+const loginStore = useLoginStore()
+const { permissions } = storeToRefs(loginStore)
 
+const hasPermission = (permission) => {
+    return permissions.value.includes(permission)
+}
 </script>
 
 

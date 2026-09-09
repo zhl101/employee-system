@@ -31,6 +31,29 @@
 
     </el-dialog>
 
+    <el-dialog v-model="showPermissionForm" title="设置权限" width="420px">
+      <p>
+        当前角色：
+        {{ currentRole?.name }}
+      </p>
+
+      <el-checkbox-group v-model="selectedPermissions">
+        <el-checkbox  v-for="permission in permissions" :key="permission.id" :value="permission.id">
+          {{ permission.name }}
+        </el-checkbox>
+      </el-checkbox-group>
+
+      <template #footer>
+        <el-button @click="showPermissionForm = false">
+          取消
+        </el-button>
+
+        <el-button type="primary" @click="savePermissions">
+          保存
+        </el-button>
+      </template>
+    </el-dialog>
+
     <el-table :data="roles">
       <el-table-column prop="id" label="ID" />
       <el-table-column prop="name" label="角色名称" />
@@ -38,6 +61,9 @@
       <el-table-column label="操作">
         <template #default="scope">
           <!-- <el-button type="primary">编辑</el-button> -->
+          <el-button type="success" @click="openPermissionForm(scope.row)">
+            设置权限
+          </el-button>
           <el-button typy="danger" @click="deleteButton(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -54,10 +80,56 @@ import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia';
 import { useRoleStore } from '../stores/role';
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { usePermissionStore } from '../stores/permission'
 
+
+const showPermissionForm = ref(false)
+const currentRole = ref(null)
+const selectedPermissions = ref([])
+const permissionStore = usePermissionStore()
+const { permissions } = storeToRefs(permissionStore)
 const roleStore = useRoleStore()
 const { roles } = storeToRefs(roleStore)
 const showForm = ref(false)
+
+const openPermissionForm = async (role) => {
+    currentRole.value = role
+
+    try {
+        const data = await permissionStore.loadRolePermissions(role.id)
+
+        selectedPermissions.value = data.map(
+            item => item.permission_id
+        )
+
+        showPermissionForm.value = true
+    } catch (err) {
+        console.error('获取角色权限失败：', err)
+        ElMessage.error('获取角色权限失败')
+    }
+}
+
+const savePermissions = async () => {
+   try {
+        await permissionStore.savePermissions(
+            currentRole.value.id,
+            selectedPermissions.value
+        )
+
+        ElMessage.success('权限保存成功')
+
+        showPermissionForm.value = false
+    } catch (err) {
+        console.error('保存权限失败：', err)
+
+        ElMessage.error(
+            err.response?.data?.message || '权限保存失败'
+        )
+    }
+}
+
+
+
 const newRole = ref({
   name: '',
   description: ''
@@ -91,7 +163,7 @@ const cancelAdd = () => {
     description: ''
 
   }
-   formRef.value?.resetFields()
+  formRef.value?.resetFields()
 }
 
 const addRole = async () => {
@@ -132,7 +204,7 @@ const deleteButton = async (id) => {
   try {
     // Element Plus确认框
     await ElMessageBox.confirm(
-      '确定要删除这个部门吗？',
+      '确定要删除这个角色吗？',
       '删除提示',
       {
         confirmButtonText: '确定',
@@ -172,8 +244,11 @@ const deleteButton = async (id) => {
 
 onMounted(async () => {
   await roleStore.loadRoles()
+  await permissionStore.loadPermissions()
 })
 </script>
+
+
 <style scoped>
 .authority-page {
   padding: 30px;
