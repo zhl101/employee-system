@@ -4,13 +4,25 @@ import axios from 'axios'
 
 export const useLoginStore = defineStore('login', () => {
 
-    // 保存登录后的用户信息
-    const user = ref(null)
+    // localStorage持久化
 
-    const permissions = ref([])
+    // 从localStorage 恢复用户信息
+    const user = ref(
+        JSON.parse(localStorage.getItem('user')) || null
+    )
 
-    // 登录状态
-    const isLogin = ref(false)
+    // 从localStorage 恢复权限
+    const permissions = ref(
+        JSON.parse(localStorage.getItem('permissions')) || []
+    )
+
+    // 从localStorage恢复token
+    const token = ref(
+        localStorage.getItem('token') || ''
+    )
+    // 根据token判断登陆状态
+    const isLogin = ref(!!token.value)
+
 
     // 登录
     async function login(username, password) {
@@ -27,13 +39,33 @@ export const useLoginStore = defineStore('login', () => {
             user.value = res.data.user
 
             // 保存后端返回的权限信息
-            permissions.value=res.data.permissions
+            permissions.value = res.data.permissions
+
+
+            // 保存JWT
+            token.value = res.data.token
 
             // 修改登录状态
             isLogin.value = true
 
+            // 保存到localStorage
+            localStorage.setItem(
+                'user',
+                JSON.stringify(user.value)
+            )
+            localStorage.setItem(
+                'permissions',
+                JSON.stringify(permissions.value)
+            )
+
+            localStorage.setItem(
+                'token',
+                token.value
+            )
+
             console.log('登录成功：', user.value)
             console.log('登录成功：', permissions.value)
+            console.log('Token:', token.value)
 
             return res.data
 
@@ -46,14 +78,23 @@ export const useLoginStore = defineStore('login', () => {
 
     // 退出登录
     function logout() {
+
+        // 删除用户信息
         user.value = null
-        permissions.value=[]
+        permissions.value = []
+        token.value = ''
         isLogin.value = false
+
+        // 删除localStorage
+        localStorage.removeItem('user')
+        localStorage.removeItem('permissons')
+        localStorage.removeItem('token')
     }
 
     return {
         user,
         permissions,
+        token,
         isLogin,
         login,
         logout

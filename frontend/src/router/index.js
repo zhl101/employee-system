@@ -52,4 +52,24 @@ const router = createRouter({
     routes
 })
 
+
+// 路由守卫
+router.beforeEach((to)=>{
+     // 从 localStorage 获取 JWT
+    const token = localStorage.getItem('token')
+
+    // 没有 token，不允许访问其他页面
+    if (!token && to.path !== '/login') {
+        return '/login'
+    }
+
+    // 已经登录，不允许再次进入登录页
+    if (token && to.path === '/login') {
+        return '/home'
+    }
+
+    // 其他情况正常进入
+    return true
+})
+
 export default router

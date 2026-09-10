@@ -2,9 +2,12 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const db = require('../config/db')
+const jwt=require('jsonwebtoken')
 
 router.post('/', (req, res) => {
     const { username, password } = req.body
+
+    
 
     // 1. 检查前端有没有传账号密码
     if (!username || !password) {
@@ -74,6 +77,18 @@ router.post('/', (req, res) => {
                     item => item.code
                 )
 
+                // 生成JWT
+                const token =jwt.sign(
+                    {
+                        id:user.id,
+                        username:user.username,
+                        roleId:user.role_id
+                    },
+                   ' employee_system-secret',{
+                    expiresIn:'2h'
+                   }
+                )
+
                 res.json({
                     code: 200,
                     message: '登录成功',
@@ -82,7 +97,8 @@ router.post('/', (req, res) => {
                         username: user.username,
                         roleId: user.role_id
                     },
-                    permissions
+                    permissions,
+                    token
                 })
             }
         )

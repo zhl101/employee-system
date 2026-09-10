@@ -1,7 +1,6 @@
 <template>
       <header class="header">
         <h1>企业员工管理系统</h1>
-        <span>管理员</span>
       </header>
 </template>
 

@@ -107,6 +107,9 @@
             </div>
 
         </div>
+        <button @click="handleLogout">
+    退出登录
+</button>
 
     </aside>
 
@@ -116,12 +119,19 @@
 <script setup>
 
 // Element Plus 图标
-
-import { House,User, OfficeBuilding,Lock,Setting} from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import { useLoginStore } from '../stores/login'
+import { House,User, OfficeBuilding,Lock,Setting} from '@element-plus/icons-vue'
 import { storeToRefs } from 'pinia'
+
+const router=useRouter()
 const loginStore = useLoginStore()
 const { permissions } = storeToRefs(loginStore)
+function handleLogout(){
+    loginStore.logout()
+
+    router.push('/login')
+}
 
 const hasPermission = (permission) => {
     return permissions.value.includes(permission)

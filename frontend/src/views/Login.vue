@@ -9,46 +9,21 @@
                 用户登录
             </p>
 
-            <el-form
-                ref="formRef"
-                :model="loginForm"
-                :rules="rules"
-                label-width="70px"
-            >
+            <el-form ref="formRef" :model="loginForm" :rules="rules" label-width="70px">
 
                 <!-- 账号 -->
-                <el-form-item
-                    label="账号"
-                    prop="username"
-                >
-                    <el-input
-                        v-model="loginForm.username"
-                        placeholder="请输入账号"
-                        clearable
-                    />
+                <el-form-item label="账号" prop="username">
+                    <el-input v-model="loginForm.username" placeholder="请输入账号" clearable />
                 </el-form-item>
 
                 <!-- 密码 -->
-                <el-form-item
-                    label="密码"
-                    prop="password"
-                >
-                    <el-input
-                        v-model="loginForm.password"
-                        type="password"
-                        placeholder="请输入密码"
-                        show-password
-                    />
+                <el-form-item label="密码" prop="password">
+                    <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" show-password />
                 </el-form-item>
 
                 <!-- 登录按钮 -->
                 <el-form-item>
-                    <el-button
-                        type="primary"
-                        style="width: 100%"
-                        :loading="loading"
-                        @click="handleLogin"
-                    >
+                    <el-button type="primary" style="width: 100%" :loading="loading" @click="handleLogin">
                         {{ loading ? '登录中...' : '登录' }}
                     </el-button>
                 </el-form-item>
@@ -125,6 +100,13 @@ const handleLogin = async () => {
         // 登录成功
         ElMessage.success('登录成功')
 
+        // 检查 token
+        console.log(
+            'localStorage中的token:',
+            localStorage.getItem('token')
+        )
+
+
         // 跳转首页
         router.push('/home')
 
@@ -182,4 +164,3 @@ const handleLogin = async () => {
     margin-bottom: 30px;
 }
 </style>
-
