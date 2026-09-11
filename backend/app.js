@@ -7,6 +7,7 @@ const departmentRouter=require('./routes/department')
 const roleRouter=require('./routes/role')
 const permissionRouter=require('./routes/permission')
 const loginRouter = require('./routes/login')
+const userRouter=require('./routes/user')
 // 允许跨域
 app.use(cors())
 // 解析JSON
@@ -16,6 +17,7 @@ app.use('/api/departments',departmentRouter)
 app.use('/api/roles',roleRouter)
 app.use('/api/permissions',permissionRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/users',userRouter)
 
 // 测试接口
 app.get('/api/test',(req,res)=>{
