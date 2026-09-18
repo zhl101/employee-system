@@ -41,7 +41,7 @@ import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useLoginStore } from '../stores/login'
 
-// Router
+// Router 获取全局路由实例
 const router = useRouter()
 
 // Pinia

@@ -97,7 +97,7 @@
             <div class="user-info">
 
                 <strong>
-                    管理员
+                    {{ loginStore.user?.username }}
                 </strong>
 
                 <span>

@@ -80,11 +80,14 @@ router.post('/', (req, res) => {
                 // 生成JWT
                 const token =jwt.sign(
                     {
+                        // token里面存放用户信息
                         id:user.id,
                         username:user.username,
                         roleId:user.role_id
                     },
-                   ' employee_system-secret',{
+                    // 加密签名
+                   ' employee_system-secret',
+                   {
                     expiresIn:'2h'
                    }
                 )

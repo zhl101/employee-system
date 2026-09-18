@@ -3,8 +3,10 @@ const router = express.Router()
 
 const db = require('../config/db')
 
+const verifyToken=require('../middleware/auth')
+const checkPermission =require('../middleware/permission')
 // 获取所有员工
-router.get('/', (req, res) => {
+router.get('/', verifyToken,checkPermission('employee'),(req, res) => {
     const sql = 'SELECT * FROM employees'
 
     db.query(sql, (err, results) => {

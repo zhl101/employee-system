@@ -5,7 +5,15 @@ const bcrypt = require('bcrypt')
 
 // 获取用户
 router.get('/', (req, res) => {
-    const sql = `SELECT * FROM users`
+    const sql = `SELECT
+     users.id,
+     users.username,
+     users.role_id,
+     roles.name AS role_name
+      FROM users
+      LEFT JOIN roles
+      ON users.role_id=roles.id
+      `
     db.query(sql, (err, results) => {
         if (err) {
             console.log('获取用户失败:', err)
@@ -56,7 +64,7 @@ router.post('/', async (req, res) => {
             // 使用bcypt加密密码
             const hashedPassword = await bcrypt.hash(password, 10)
 
-            const sql = 'INSERT INTO users (username,password,role_id)VALUE(?,?,?)'
+            const sql = 'INSERT INTO users (username,password,role_id)VALUES(?,?,?)'
             db.query(sql,[username, hashedPassword, roleId], (err, results) => {
                 if (err) {
                     console.error('新增用户失败：', err)
@@ -74,7 +82,7 @@ router.post('/', async (req, res) => {
 
         })
     }catch(err){
-         console.error('密码加密失败：', error)
+         console.error('密码加密失败：', err)
 
         res.status(500).json({
             message: '服务器错误'

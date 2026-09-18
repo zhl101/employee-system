@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref,computed } from 'vue'
 import axios from 'axios'
+import type { Department } from '../types/department'
 
 export const useDepartmentStore = defineStore('department', () => {
     // 部门数据
-    const departments = ref([])
+    const departments = ref<Department[]>([])
 
      // getter:部门数量
     const departmentCount = computed(() => {
@@ -14,9 +15,9 @@ export const useDepartmentStore = defineStore('department', () => {
     })
 
     // 获取所有部门
-    async function loadDepartments() {
+    async function loadDepartments() :Promise<void>{
         try {
-            const res = await axios.get(
+            const res = await axios.get<Department[]>(
                 'http://localhost:3000/api/departments'
             )
             departments.value = res.data
@@ -31,9 +32,9 @@ export const useDepartmentStore = defineStore('department', () => {
     }
 
     // 新增部门
-    async function addDepartment(departmentData) {
+    async function addDepartment(departmentData:Omit<Department,'id'>):Promise<void> {
         try {
-            const res = await axios.post(
+            const res = await axios.post<Department>(
                 'http://localhost:3000/api/departments',
                 departmentData
             )
@@ -50,9 +51,9 @@ export const useDepartmentStore = defineStore('department', () => {
     }
 
     // 修改部门
-    async function updateDepartment(id, departmentData) {
+    async function updateDepartment(id:number, departmentData:Omit<Department,'id'>) :Promise<void>{
         try {
-            const res = await axios.put(
+            const res = await axios.put<Department>(
                 `http://localhost:3000/api/departments/${id}`,
                 departmentData
             )
@@ -76,9 +77,9 @@ export const useDepartmentStore = defineStore('department', () => {
     }
 
     // 删除部门
-    async function deleteDepartment(id) {
+    async function deleteDepartment(id:number):Promise<void> {
         try {
-            const res = await axios.delete(
+            const res = await axios.delete<{message:string}>(
                 `http://localhost:3000/api/departments/${id}`
             )
 

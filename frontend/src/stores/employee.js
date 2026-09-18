@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import request from '../api/request'
 
 export const useEmployeeStore = defineStore('employee', () => {
     // state:员工数据
@@ -33,9 +34,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     // action:获取员工数据
     async function loadEmployees() {
         try {
-            const res = await axios.get(
-                'http://localhost:3000/api/employees'
-            )
+            const res = await request.get('/employees')
+            console.log(res.data)
             employees.value = res.data
             console.log('员工数据加载成功：', employees.value)
         } catch (err) {
