@@ -1,5 +1,5 @@
 const jwt =require('jsonwebtoken') 
-const JWT_SECERET='employee_system-secret'
+const JWT_SECRET='employee_system-secret'
 
 
 function verifyToken(req,res,next){

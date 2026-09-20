@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import {ref } from 'vue'
-import axios from "axios"
+import request from "../api/request"
 
 export  const useUserStore=defineStore('user',()=>{
     // status:
@@ -9,8 +9,8 @@ export  const useUserStore=defineStore('user',()=>{
     // actions:获取用户
     async function loadUsers(){
         try{
-            const res =await axios.get(
-                `http://localhost:3000/api/users`
+            const res =await request.get(
+                `/users`
             )
 
             users.value=res.data
@@ -25,8 +25,8 @@ export  const useUserStore=defineStore('user',()=>{
     // actions:
     async function addUser(userdata){
         try{
-            const res =await axios.post(
-                `http://localhost:3000/api/users`,
+            const res =await request.post(
+                `/users`,
                 userdata
             )
             await loadUsers()

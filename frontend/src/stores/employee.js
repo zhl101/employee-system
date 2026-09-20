@@ -45,7 +45,7 @@ export const useEmployeeStore = defineStore('employee', () => {
     async function addEmployee(employeeData) {
         try {
             await request.post(
-                '/employees',
+                `/employees`,
                 employeeData
             )
 
@@ -63,7 +63,7 @@ export const useEmployeeStore = defineStore('employee', () => {
     async function updateEmployee(id, employeeData) {
         try {
             const res = await request.put(
-                '/employees/${id}',
+                `/employees/${id}`,
                 employeeData
             )
             console.log('修改员工成功：', res.data)

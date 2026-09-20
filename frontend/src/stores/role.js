@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import axios from 'axios'
+import { ref } from 'vue'
+import request from '../api/request'
 
 export const useRoleStore = defineStore('role', () => {
     // states:角色数据
@@ -9,8 +9,8 @@ export const useRoleStore = defineStore('role', () => {
     // action:获取所有角色
     async function loadRoles() {
         try {
-            const res = await axios.get(
-                `http://localhost:3000/api/roles`
+            const res = await request.get(
+                `/roles`
             )
             roles.value = res.data
             console.log('角色数据加载成功：', roles.value)
@@ -22,8 +22,8 @@ export const useRoleStore = defineStore('role', () => {
     // actions:增加角色
     async function addRole(roleData){
         try{
-            const res =await axios.post(
-                `http://localhost:3000/api/roles`,
+            const res =await request.post(
+                `/roles`,
                roleData
             )
             console.log(
@@ -40,8 +40,8 @@ export const useRoleStore = defineStore('role', () => {
     // 删除角色
     async function deleteRole(id){
         try{
-            const res =await axios.delete(
-                `http://localhost:3000/api/roles/${id}`
+            const res =await request.delete(
+                `/roles/${id}`
             )
             console.log(
                 '删除角色成功：',

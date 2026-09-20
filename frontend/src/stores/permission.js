@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
+import request from '../api/request'
 
 
 export const usePermissionStore = defineStore('permission', () => {
@@ -10,8 +10,8 @@ export const usePermissionStore = defineStore('permission', () => {
     // action:获取权限列表
     async function loadPermissions() {
         try {
-            const res = await axios.get(
-                `http://localhost:3000/api/permissions`
+            const res = await request.get(
+                `/permissions`
             )
             permissions.value = res.data
             console.log('权限数据加载成功', permissions.value)
@@ -24,8 +24,8 @@ export const usePermissionStore = defineStore('permission', () => {
 
     async function savePermissions(roleId, permissionIds) {
         try {
-            const res = await axios.put(
-                `http://localhost:3000/api/permissions/${roleId}/permissions`,
+            const res = await request.put(
+                `/permissions/${roleId}/permissions`,
                 {
                     permissionIds
                 }
@@ -41,8 +41,8 @@ export const usePermissionStore = defineStore('permission', () => {
 
     async function loadRolePermissions(roleId) {
     try {
-        const res = await axios.get(
-            `http://localhost:3000/api/permissions/role/${roleId}`
+        const res = await request.get(
+            `/permissions/role/${roleId}`
         )
 
         console.log('角色权限加载成功：', res.data)

@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
+import request from '../api/request'
 import type { User } from '../types/user'
+
 
 export const useLoginStore = defineStore('login', () => {
     const user = ref<User | null>(null)
@@ -36,8 +37,8 @@ export const useLoginStore = defineStore('login', () => {
     // 登录函数
     async function login(username: string, password: string) {
         try {
-            const res = await axios.post(
-                `http://localhost:3000/api/login`,
+            const res = await request.post(
+                `/login`,
                 {
                     username,
                     password

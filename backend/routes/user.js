@@ -2,9 +2,11 @@ const express = require('express')
 const router = express.Router()
 const db = require('../config/db')
 const bcrypt = require('bcrypt')
+const  verifyToken = require('../middleware/auth')
+const  checkPermission = require('../middleware/permission')
 
 // 获取用户
-router.get('/', (req, res) => {
+router.get('/', verifyToken,checkPermission('user'),(req, res) => {
     const sql = `SELECT
      users.id,
      users.username,
@@ -26,7 +28,7 @@ router.get('/', (req, res) => {
 })
 
 // 新增用户
-router.post('/', async (req, res) => {
+router.post('/',verifyToken,checkPermission('user'), async (req, res) => {
     const {
         username,
         password,
