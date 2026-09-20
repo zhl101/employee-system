@@ -72,7 +72,7 @@ import { computed } from 'vue'
 // Element Plus 图标
 import { useRouter } from 'vue-router'
 import { useLoginStore } from '../stores/login'
-import { House, User, OfficeBuilding, Lock, Setting } from '@element-plus/icons-vue'
+import { House, User, OfficeBuilding, Lock, Setting, UserFilled } from '@element-plus/icons-vue'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
@@ -98,10 +98,16 @@ const menus = [
         permission: 'department'
     },
     {
-        name: '权限管理',
+        name: '角色管理',
         path: '/authority',
         icon: Lock,
         permission: 'permission'
+    },
+    {
+        name: '用户管理',
+        path: '/user',
+        icon: UserFilled,
+        permission: 'user'
     },
     {
         name: '系统管理',

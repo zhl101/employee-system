@@ -5,6 +5,7 @@ import Department from '../views/Department.vue'
 import Authority from '../views/Authority.vue'
 import System from '../views/System.vue'
 import Login from '../views/Login.vue'
+import User from '../views/User.vue'
 import { useLoginStore } from '../stores/login'
 
 // 挂载路由
@@ -45,6 +46,15 @@ const routes = [
         meta: {
             permission: 'permission'
         }
+    },
+    { 
+        path:'/user',
+        name:'User',
+        component:User,
+        meta:{
+            permission:'user'
+        }
+
     }
     ,
     {

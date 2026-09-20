@@ -38,11 +38,29 @@ export  const useUserStore=defineStore('user',()=>{
         }
     }
 
+    async function deleteUser(id){
+        try{
+            const res =await request.delete(
+                `/users/${id}`
+            )
+
+            // 重新加载用户数据
+            await loadUsers()
+
+
+        }catch(err){
+            console.error("删除用户失败：",err)
+            throw err
+        }
+
+    }
+
 
     return {
         users,
         loadUsers,
-        addUser
+        addUser,
+        deleteUser
 
     }
 

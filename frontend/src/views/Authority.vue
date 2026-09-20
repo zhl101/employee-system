@@ -7,7 +7,6 @@
 
       <header-buttons>
         <el-button type="primary" @click="openAddForm">新增角色</el-button>
-        <el-button type="primary" @click="openAddUserForm">新增用户</el-button>
       </header-buttons>
     </div>
 
@@ -36,39 +35,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model='showUserForm' title="新增用户" width="420px">
-      <el-form :model="newUser" label-width="80px">
-        <el-form-item label="用户名字">
-          <el-input v-model="newUser.username" placeholder="请输入用户名字" />
-        </el-form-item>
-
-
-        <el-form-item>
-          <el-input v-model="newUser.password" type="password" show-password placeholder="请输入密码" />
-        </el-form-item>
-
-
-        <el-form-item label="用户角色">
-          <el-select v-model="newUser.roleId" placeholder=" 请选择角色">
-            <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id"></el-option>
-          </el-select>
-
-
-        </el-form-item>
-      </el-form>
-      <!-- Dialog 底部 -->
-      <template #footer>
-
-        <el-button @click="cancelAddUser">
-          取消
-        </el-button>
-
-        <el-button type="primary" @click="addUser">
-          确定
-        </el-button>
-
-      </template>
-    </el-dialog>
+   
 
     <el-dialog v-model="showPermissionForm" title="设置权限" width="420px">
       <p>
@@ -103,7 +70,7 @@
           <el-button type="success" @click="openPermissionForm(scope.row)">
             设置权限
           </el-button>
-          <el-button typy="danger" @click="deleteButton(scope.row.id)">删除</el-button>
+          <el-button type="danger" @click="deleteButton(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
 
@@ -121,7 +88,7 @@ import { storeToRefs } from 'pinia';
 import { useRoleStore } from '../stores/role';
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { usePermissionStore } from '../stores/permission'
-import { useUserStore } from '../stores/user';
+
 
 
 
@@ -135,16 +102,10 @@ const { permissions } = storeToRefs(permissionStore)
 const roleStore = useRoleStore()
 const { roles } = storeToRefs(roleStore)
 
-const userStore = useUserStore()
-const { users } = storeToRefs(userStore)
 
 const showPermissionForm = ref(false)
 const showForm = ref(false)
-const showUserForm = ref(false)
 
-const openAddUserForm = () => {
-  showUserForm.value = true
-}
 
 const openPermissionForm = async (role) => {
   currentRole.value = role
@@ -163,11 +124,7 @@ const openPermissionForm = async (role) => {
   }
 }
 
-const newUser = ref({
-  username: '',
-  password: '',
-  roleId: ''
-})
+
 const savePermissions = async () => {
   try {
     await permissionStore.savePermissions(
@@ -224,14 +181,7 @@ const cancelAdd = () => {
   }
   formRef.value?.resetFields()
 }
-const cancelAddUser = () => {
-  showUserForm.value = false
-  newUser.value = {
-    username: '',
-    password: '',
-    roleId: ''
-  }
-}
+
 
 const addRole = async () => {
 
@@ -266,33 +216,7 @@ const addRole = async () => {
     )
   }
 }
-const addUser = async () => {
-  try {
 
-    // 调用Pinia,发送新增用户请求
-    await userStore.addUser(newUser.value)
-
-    showUserForm.value = false
-
-    //  清空表单
-    newUser.value = {
-      username: '',
-      password: '',
-      roleId: ''
-    }
-
-     //  成功提示
-    ElMessage.success('新增用户成功')
-
-  } catch (err) {
-     // 5. 控制台打印错误
-    console.error('新增用户失败：', err)
-
-    // 6. 显示后端返回的错误信息
-    ElMessage.error(
-      err.response?.data?.message || '新增用户失败')
-  }
-}
 
 const deleteButton = async (id) => {
   try {
@@ -312,7 +236,7 @@ const deleteButton = async (id) => {
     await roleStore.deleteRole(id)
     // 成功提示
     ElMessage.success(
-      '删除部门成功'
+      '删除角色成功'
     )
   } catch (err) {
     // 点击取消也会进入 catch
@@ -339,7 +263,6 @@ const deleteButton = async (id) => {
 onMounted(async () => {
   await roleStore.loadRoles()
   await permissionStore.loadPermissions()
-  await userStore.loadUsers()
 })
 </script>
 

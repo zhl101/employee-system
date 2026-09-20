@@ -6,7 +6,7 @@ const  verifyToken = require('../middleware/auth')
 const  checkPermission = require('../middleware/permission')
 
 // 获取用户
-router.get('/', verifyToken,checkPermission('employee'),(req, res) => {
+router.get('/', verifyToken,checkPermission('user'),(req, res) => {
     const sql = `SELECT
      users.id,
      users.username,
@@ -28,7 +28,7 @@ router.get('/', verifyToken,checkPermission('employee'),(req, res) => {
 })
 
 // 新增用户
-router.post('/',verifyToken,checkPermission('employee'), async (req, res) => {
+router.post('/',verifyToken,checkPermission('user'), async (req, res) => {
     const {
         username,
         password,
@@ -90,6 +90,27 @@ router.post('/',verifyToken,checkPermission('employee'), async (req, res) => {
             message: '服务器错误'
         })
     }
+})
+
+// 删除用户
+router.delete('/:id',verifyToken,checkPermission('user'),(req,res)=>{
+    const id=req.params.id
+    const sql=`
+        DELETE FROM users WHERE id=?
+    `
+
+    db.query(sql,[id],(err,results)=>{
+        if(err){
+             console.log('删除用户失败:', err)
+            return res.status(500).json({
+                message: '删除用户失败'
+            })
+        }
+        res.json({
+            code:200,
+            message:'删除用户成功'
+        })
+    })
 })
 
 module.exports=router

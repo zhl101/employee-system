@@ -1,6 +1,6 @@
 const jwt =require('jsonwebtoken') 
 require('dotenv').config()
-const JWT_SECRET='employee_system-secret'
+const JWT_SECRET=process.env.JWT_SECRET
 
 
 function verifyToken(req,res,next){
