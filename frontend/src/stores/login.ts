@@ -1,34 +1,57 @@
-import  {defineStore} from 'pinia'
-import {ref} from 'vue'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import axios from 'axios'
-import type {User} from '../types/user'
+import type { User } from '../types/user'
 
-export  const useLoginStore=defineStore('login',()=>{
-    const user=ref<User |null>(null)
-    const permissions=ref<string[]>([])
-    const token =ref<string>('')
+export const useLoginStore = defineStore('login', () => {
+    const user = ref<User | null>(null)
+    const permissions = ref<string[]>([])
+    const token = ref<string>('')
     // 定义登录状态
-    const isLogin=ref(false)
+    const isLogin = ref(false)
+
+    function loadFromStorage() {
+        const savedUser = localStorage.getItem('user')
+        const savedPermissions = localStorage.getItem('permissions')
+        const savedToken = localStorage.getItem('token')
+
+        if (savedUser) {
+            user.value = JSON.parse(savedUser)
+        }
+
+        if (savedPermissions) {
+            permissions.value = JSON.parse(savedPermissions)
+        }
+
+        if (savedToken) {
+            token.value = savedToken
+        }
+
+        if (savedToken) {
+            isLogin.value = true
+        }
+    }
+    loadFromStorage()
 
     // 登录函数
-    async function login(username:string,password:string){
-      try {
-         const res=await axios.post(
-            `http://localhost:3000/api/login`,
-            {
-                username,
-                password
-            }
-        )
+    async function login(username: string, password: string) {
+        try {
+            const res = await axios.post(
+                `http://localhost:3000/api/login`,
+                {
+                    username,
+                    password
+                }
+            )
 
-        user.value=res.data.user
-        permissions.value=res.data.permissions
-        token.value=res.data.token
+            user.value = res.data.user
+            permissions.value = res.data.permissions
+            token.value = res.data.token
 
-        // 修改登录状态
-        isLogin.value=true
+            // 修改登录状态
+            isLogin.value = true
 
-         // 持久化用户信息
+            // 持久化用户信息
             localStorage.setItem(
                 'user',
                 JSON.stringify(user.value)
@@ -46,7 +69,7 @@ export  const useLoginStore=defineStore('login',()=>{
                 token.value
             )
 
-              console.log('登录成功')
+            console.log('登录成功')
             console.log('用户：', user.value)
             console.log('权限：', permissions.value)
             console.log('JWT：', token.value)
@@ -55,19 +78,19 @@ export  const useLoginStore=defineStore('login',()=>{
 
 
 
-    }catch(err){
-            console.error('登录失败',err)
+        } catch (err) {
+            console.error('登录失败', err)
             throw err
         }
     }
 
 
-    function logout(){
+    function logout() {
         // 清空pinia
-        user.value=null
-        permissions.value=[]
-        token.value=''
-        isLogin.value=false
+        user.value = null
+        permissions.value = []
+        token.value = ''
+        isLogin.value = false
 
         // 清空localStorage
         localStorage.removeItem('user')

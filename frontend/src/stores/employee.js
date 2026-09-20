@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import axios from 'axios'
 import request from '../api/request'
 
 export const useEmployeeStore = defineStore('employee', () => {
@@ -35,9 +34,7 @@ export const useEmployeeStore = defineStore('employee', () => {
     async function loadEmployees() {
         try {
             const res = await request.get('/employees')
-            console.log(res.data)
             employees.value = res.data
-            console.log('员工数据加载成功：', employees.value)
         } catch (err) {
             console.error('员工数据加载失败：', err)
             throw err
@@ -47,8 +44,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     // 新增员工
     async function addEmployee(employeeData) {
         try {
-            await axios.post(
-                'http://localhost:3000/api/employees',
+            await request.post(
+                '/employees',
                 employeeData
             )
 
@@ -65,8 +62,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     // 修改员工
     async function updateEmployee(id, employeeData) {
         try {
-            const res = await axios.put(
-                `http://localhost:3000/api/employees/${id}`,
+            const res = await request.put(
+                '/employees/${id}',
                 employeeData
             )
             console.log('修改员工成功：', res.data)
@@ -81,8 +78,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     // 删除员工
     async function deleteEmployee(id) {
         try {
-            const res = await axios.delete(
-                `http://localhost:3000/api/employees/${id}`
+            const res = await request.delete(
+                `/employees/${id}`
             )
             console.log('删除员工成功：', res.data)
 

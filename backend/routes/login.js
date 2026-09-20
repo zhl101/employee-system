@@ -86,7 +86,7 @@ router.post('/', (req, res) => {
                         roleId:user.role_id
                     },
                     // 加密签名
-                   ' employee_system-secret',
+                   'employee_system-secret',
                    {
                     expiresIn:'2h'
                    }

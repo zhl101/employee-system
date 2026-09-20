@@ -1,9 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const db = require('../config/db')
+const  verifyToken = require('../middleware/auth')
+const  checkPermission = require('../middleware/permission')
 
 // 获取所有部门
-router.get('/', (req, res) => {
+router.get('/', verifyToken,checkPermission('department'),(req, res) => {
     const sql = 'SELECT * FROM departments'
     db.query(sql, (err, results) => {
         if (err) {
@@ -18,7 +20,7 @@ router.get('/', (req, res) => {
 
 
 // 新增部门
-router.post('/', (req, res) => {
+router.post('/', verifyToken,checkPermission('department'),(req, res) => {
     const { name, description } = req.body
     const sql = `INSERT INTO departments (name,description) VALUES(?,?)`
     db.query(sql, [name, description], (err, results) => {
@@ -46,7 +48,7 @@ router.post('/', (req, res) => {
 })
 
 // 删除部门
-router.delete('/:id',(req,res)=>{
+router.delete('/:id',verifyToken,checkPermission('department'),(req,res)=>{
     const id=req.params.id
     const sql=`DELETE FROM departments WHERE id=?`
     db.query(sql,[id],(err,result)=>{
@@ -64,7 +66,7 @@ router.delete('/:id',(req,res)=>{
 })
 
 // 编辑部门
-router.put('/:id', (req, res) => {
+router.put('/:id',verifyToken,checkPermission('department'), (req, res) => {
 
     const id = req.params.id
 

@@ -21,10 +21,6 @@ export const useDepartmentStore = defineStore('department', () => {
                 'http://localhost:3000/api/departments'
             )
             departments.value = res.data
-            console.log(
-                '部门数据加载成功：',
-                departments.value
-            )
         } catch (err) {
             console.error('获取部门失败', err)
             throw err

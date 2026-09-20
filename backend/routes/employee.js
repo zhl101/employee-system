@@ -22,7 +22,7 @@ router.get('/', verifyToken,checkPermission('employee'),(req, res) => {
 })
 
 // 新增员工
-router.post('/', (req, res) => {
+router.post('/',verifyToken,checkPermission('employee'), (req, res) => {
     const {
         name,
         department ,
@@ -53,7 +53,7 @@ router.post('/', (req, res) => {
 })
 
 // 编辑员工
-router.put('/:id',(req,res)=>{
+router.put('/:id',verifyToken,checkPermission('employee'),(req,res)=>{
     const id=req.params.id
     const {
         name,
@@ -83,7 +83,7 @@ router.put('/:id',(req,res)=>{
 })
 
 // 删除员工
-router.delete('/:id',(req,res)=>{
+router.delete('/:id',verifyToken,checkPermission('employee'),(req,res)=>{
     const id=req.params.id
     const sql=`DELETE   FROM employees WHERE id=?`
     db.query(sql,[id],(err,result)=>{

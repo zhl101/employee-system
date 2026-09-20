@@ -1,9 +1,11 @@
 const express=require('express')
 const router =express.Router()
 const db=require('../config/db')
+const  verifyToken = require('../middleware/auth')
+const  checkPermission = require('../middleware/permission')
 
 // 获取角色数据
-router.get('/',(req,res)=>{
+router.get('/',verifyToken,checkPermission('authority'),(req,res)=>{
     const sql='SELECT * FROM roles'
 
     db.query(sql,(err,results)=>{
@@ -18,7 +20,7 @@ router.get('/',(req,res)=>{
 })
 
 // 新增角色
-router.post('/',(req,res)=>{
+router.post('/',verifyToken,checkPermission('authority'),(req,res)=>{
      const { name, description } = req.body
     const sql = `INSERT INTO roles (name,description) VALUES(?,?)`
      db.query(sql, [name, description], (err, results) => {
@@ -49,7 +51,7 @@ router.post('/',(req,res)=>{
 
 // 删除角色
 
-router.delete('/:id',(req,res)=>{
+router.delete('/:id',verifyToken,checkPermission('authority'),(req,res)=>{
     const id=req.params.id
     const sql=`DELETE FROM roles WHERE id=?`
     db.query(sql,[id],(err,results)=>{

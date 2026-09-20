@@ -1,7 +1,7 @@
 <template>
 
     <aside class="sidebar">
-       <div class="logo">
+        <div class="logo">
             <div class="logo-icon">
                 E
             </div>
@@ -17,70 +17,23 @@
             </span>
         </div>
 
-        <nav class="menu">
-            <p class="menu-title">
-                MENU
-            </p>
+  <el-menu
+    class="sidebar-menu"
+    :default-active="$route.path"
+    router
+>
+    <el-menu-item
+        v-for="menu in visibleMenus"
+        :key="menu.path"
+        :index="menu.path"
+    >
+        <el-icon>
+            <component :is="menu.icon" />
+        </el-icon>
 
-           <!-- 首页 -->
-            <router-link to="/home" class="menu-item">
-                <el-icon class="icon">
-                    <House />
-                </el-icon>
-                <span>
-                    首页
-                </span>
-            </router-link>
-
-
-            <!-- 员工管理 -->
-            <router-link  v-if="hasPermission('employee')" to="/employee" class="menu-item">
-                <el-icon class="icon">
-                    <User />
-                </el-icon>
-                <span>
-                    员工管理
-                </span>
-            </router-link>
-
-
-            <!-- 部门管理 -->
-            <router-link  v-if="hasPermission('departement')" to="/department"  class="menu-item" >
-                <el-icon class="icon">
-                    <OfficeBuilding />
-                </el-icon>
-                <span>
-                    部门管理
-                </span>
-            </router-link>
-
-
-            <!-- 系统 -->
-            <p class="menu-title">
-                SYSTEM
-            </p>
-
-            <!-- 权限管理 -->
-            <router-link  v-if="hasPermission('permission')" to="/authority" class="menu-item" >
-                 <el-icon class="icon">
-                    <Lock />
-                </el-icon>
-                <span>
-                    权限管理
-                </span>
-            </router-link>
-
-
-            <!-- 系统设置 -->
-            <router-link  v-if="hasPermission('system')" to="/system" class="menu-item">
-                <el-icon class="icon">
-                    <Setting />
-                </el-icon>
-                <span>
-                    系统设置
-                </span>
-            </router-link>
-        </nav>
+        <span>{{ menu.name }}</span>
+    </el-menu-item>
+</el-menu>
 
 
         <!-- =========================
@@ -100,16 +53,14 @@
                     {{ loginStore.user?.username }}
                 </strong>
 
-                <span>
-                    系统管理员
-                </span>
+               
 
             </div>
 
         </div>
         <button @click="handleLogout">
-    退出登录
-</button>
+            退出登录
+        </button>
 
     </aside>
 
@@ -117,30 +68,69 @@
 
 
 <script setup>
-
+import { computed } from 'vue'
 // Element Plus 图标
 import { useRouter } from 'vue-router'
 import { useLoginStore } from '../stores/login'
-import { House,User, OfficeBuilding,Lock,Setting} from '@element-plus/icons-vue'
+import { House, User, OfficeBuilding, Lock, Setting } from '@element-plus/icons-vue'
 import { storeToRefs } from 'pinia'
 
-const router=useRouter()
+const router = useRouter()
 const loginStore = useLoginStore()
 const { permissions } = storeToRefs(loginStore)
-function handleLogout(){
+
+const menus = [
+    {
+        name: '首页',
+        path: '/home',
+        icon: House
+    },
+    {
+        name: '员工管理',
+        path: '/employee',
+        icon: User,
+        permission: 'employee'
+    },
+    {
+        name: '部门管理',
+        path: '/department',
+        icon: OfficeBuilding,
+        permission: 'department'
+    },
+    {
+        name: '权限管理',
+        path: '/authority',
+        icon: Lock,
+        permission: 'authority'
+    },
+    {
+        name: '系统管理',
+        path: '/system',
+        icon: Setting,
+        permission: 'system'
+    }
+]
+const visibleMenus = computed(() => {
+    return menus.filter(menu => {
+        // 首页不需要权限
+        if (!menu.permission) {
+            return true
+        }
+
+        // 有权限才显示
+        return permissions.value.includes(menu.permission)
+    })
+})
+function handleLogout() {
     loginStore.logout()
 
     router.push('/login')
 }
 
-const hasPermission = (permission) => {
-    return permissions.value.includes(permission)
-}
 </script>
 
 
 <style scoped>
-
 /* =========================
    整个侧边栏
 ========================= */
@@ -275,50 +265,46 @@ const hasPermission = (permission) => {
 }
 
 
+
 /* =========================
-   菜单项
+   Element Plus 菜单
 ========================= */
 
-.menu-item {
+.sidebar-menu {
+    flex: 1;
 
-    display: flex;
+    border-right: none;
 
-    align-items: center;
+    background: transparent;
 
-    width: 100%;
-
-    height: 46px;
-
-    box-sizing: border-box;
-
-    margin-bottom: 5px;
-
-    padding: 0 12px;
-
-    color: #d1d5db;
-
-    text-decoration: none;
-
-    border-radius: 8px;
-
-    transition: all 0.2s;
-
+    --el-menu-bg-color: transparent;
+    --el-menu-text-color: #d1d5db;
+    --el-menu-hover-bg-color: #374151;
+    --el-menu-active-color: white;
 }
 
 
 /* =========================
-   Element Plus 图标
+   菜单项
 ========================= */
 
-.icon {
+.sidebar-menu :deep(.el-menu-item) {
 
-    width: 22px;
+    height: 46px;
 
-    height: 22px;
+    line-height: 46px;
 
-    margin-right: 10px;
+    margin-bottom: 5px;
 
-    font-size: 18px;
+    padding: 0 12px !important;
+
+    color: #d1d5db;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    transition: all 0.2s;
 
 }
 
@@ -327,7 +313,7 @@ const hasPermission = (permission) => {
    鼠标经过
 ========================= */
 
-.menu-item:hover {
+.sidebar-menu :deep(.el-menu-item:hover) {
 
     background: #374151;
 
@@ -340,13 +326,31 @@ const hasPermission = (permission) => {
    当前页面
 ========================= */
 
-.menu-item.router-link-active {
+.sidebar-menu :deep(.el-menu-item.is-active) {
 
     background: #3b82f6;
 
     color: white;
 
 }
+
+
+/* =========================
+   Element Plus 图标
+========================= */
+
+.sidebar-menu :deep(.el-icon) {
+
+    width: 22px;
+
+    height: 22px;
+
+    margin-right: 10px;
+
+    font-size: 18px;
+
+}
+
 
 
 /* =========================
@@ -414,5 +418,4 @@ const hasPermission = (permission) => {
     color: #9ca3af;
 
 }
-
 </style>

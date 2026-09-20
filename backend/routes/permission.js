@@ -1,9 +1,11 @@
 const express=require('express')
 const router =express.Router()
 const db=require('../config/db')
+const  verifyToken = require('../middleware/auth')
+const  checkPermission = require('../middleware/permission')
 
 // 获取权限接口
-router.get('/',(req,res)=>{
+router.get('/',verifyToken,checkPermission('authority'),(req,res)=>{
     const sql=`SELECT   id,name,code,parent_id,description 
     FROM permissions ORDER BY id`
 
@@ -18,7 +20,7 @@ router.get('/',(req,res)=>{
     })
 })
 
-router.get('/role/:roleId', (req, res) => {
+router.get('/role/:roleId', verifyToken,checkPermission('authority'),(req, res) => {
     const roleId = req.params.roleId
 
     const sql = `
@@ -42,7 +44,7 @@ router.get('/role/:roleId', (req, res) => {
 
 // 更改权限
 
-router.put('/:id/permissions', (req, res) => {
+router.put('/:id/permissions',verifyToken,checkPermission('authority'), (req, res) => {
     const roleId = req.params.id
     const permissionIds = req.body.permissionIds
 
