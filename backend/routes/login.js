@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
@@ -86,7 +88,7 @@ router.post('/', (req, res) => {
                         roleId:user.role_id
                     },
                     // 加密签名
-                   'employee_system-secret',
+                   process.env.JWT_SECRET,
                    {
                     expiresIn:'2h'
                    }

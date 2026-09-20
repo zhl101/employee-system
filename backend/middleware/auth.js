@@ -1,4 +1,5 @@
 const jwt =require('jsonwebtoken') 
+require('dotenv').config()
 const JWT_SECRET='employee_system-secret'
 
 
@@ -14,8 +15,16 @@ function verifyToken(req,res,next){
 
     }
 
-    // 3.获取JWT
-    const token=authHeader.split(' ')[1]
+    const parts=authHeader.split(' ')
+    if(parts.length!==2||parts[0]!=='Bearer'){
+        return res.status(401).json({
+            message:'Token格式错误'
+        })
+    }
+
+    const token=parts[1]
+
+    
 
     // 4.验证JWT
     try{

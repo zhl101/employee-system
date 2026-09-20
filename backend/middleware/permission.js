@@ -9,6 +9,7 @@ function checkPermission(permissionCode) {
         // 获取当前登录用户的角色
         const roleId = req.user.roleId
 
+
         const sql = `
             SELECT permissions.code
             FROM role_permissions
@@ -22,6 +23,8 @@ function checkPermission(permissionCode) {
             sql,
             [roleId, permissionCode],
             (err, results) => {
+
+
 
                 if (err) {
                     console.log('权限查询失败：', err)

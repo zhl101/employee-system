@@ -6,7 +6,7 @@ const  verifyToken = require('../middleware/auth')
 const  checkPermission = require('../middleware/permission')
 
 // 获取用户
-router.get('/', verifyToken,checkPermission('user'),(req, res) => {
+router.get('/', verifyToken,checkPermission('employee'),(req, res) => {
     const sql = `SELECT
      users.id,
      users.username,
@@ -28,7 +28,7 @@ router.get('/', verifyToken,checkPermission('user'),(req, res) => {
 })
 
 // 新增用户
-router.post('/',verifyToken,checkPermission('user'), async (req, res) => {
+router.post('/',verifyToken,checkPermission('employee'), async (req, res) => {
     const {
         username,
         password,
