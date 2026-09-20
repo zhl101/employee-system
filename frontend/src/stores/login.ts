@@ -86,6 +86,17 @@ export const useLoginStore = defineStore('login', () => {
     }
 
 
+        // 重新拉取当前用户的权限
+    async function refreshPermissions() {
+        const res = await request.get('/me')
+
+        user.value = res.data.user
+        permissions.value = res.data.permissions
+
+        localStorage.setItem('user', JSON.stringify(user.value))
+        localStorage.setItem('permissions', JSON.stringify(permissions.value))
+    }
+
     function logout() {
         // 清空pinia
         user.value = null
@@ -106,6 +117,7 @@ export const useLoginStore = defineStore('login', () => {
         token,
         isLogin,
         login,
+        refreshPermissions,
         logout
     }
 })

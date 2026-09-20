@@ -6,11 +6,10 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import {createPinia} from 'pinia'
 
-createApp(App)
-    // 把Router安装到Vue应用里
-    .use(router)
-    .use(ElementPlus)
-    .use(createPinia())
-  
-    .mount('#app')
-    
+const app = createApp(App)
+
+app.use(createPinia())
+app.use(router)
+app.use(ElementPlus)
+
+app.mount('#app')  

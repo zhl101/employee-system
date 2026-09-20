@@ -5,6 +5,7 @@ import Department from '../views/Department.vue'
 import Authority from '../views/Authority.vue'
 import System from '../views/System.vue'
 import Login from '../views/Login.vue'
+import { useLoginStore } from '../stores/login'
 
 // 挂载路由
 const routes = [
@@ -42,7 +43,7 @@ const routes = [
         name: 'Authority',
         component: Authority,
         meta: {
-            permission: 'authority'
+            permission: 'permission'
         }
     }
     ,
@@ -64,43 +65,58 @@ const router = createRouter({
     routes
 })
 
+function isTokenExpired(token) {
+    try {
+        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+        const payload = JSON.parse(atob(base64))
+        return payload.exp * 1000 <= Date.now()
+    } catch (e) {
+        return true
+    }
+}
+
 
 // 路由守卫
-router.beforeEach((to) => {
-    // 从 localStorage 获取 JWT
+router.beforeEach(async (to) => {
     const token = localStorage.getItem('token')
 
-    // 获取权限
-    const savedPermissions = localStorage.getItem('permissions')
-    // 把权限字符串转换成数组
-    const permissions = savedPermissions ? JSON.parse(savedPermissions) : []
-
-    // 没有 token，不允许访问其他页面
-    if (!token && to.path !== '/login') {
+    if ((!token || isTokenExpired(token)) && to.path !== '/login') {
+        localStorage.removeItem('user')
+        localStorage.removeItem('permissions')
+        localStorage.removeItem('token')
         return '/login'
     }
 
-    // 已经登录，不允许再次进入登录页
     if (token && to.path === '/login') {
         return '/home'
     }
 
-    // 获取当前路由需要的权限
-    const requiredPermission = to.meta.permission
+    let permissions = []
 
-    // 如果当前页面需要权限
-    if (requiredPermission) {
-        // 判断用户有没有这个权限
-        const hasPermission = permissions.includes(requiredPermission)
+    if (token) {
+        const loginStore = useLoginStore()
 
-        // 没有权限
-        if (!hasPermission) {
-            return '/home'
+        try {
+            await loginStore.refreshPermissions()
+            permissions = loginStore.permissions
+        } catch (err) {
+            console.error('刷新权限失败：', err)
+            localStorage.removeItem('user')
+            localStorage.removeItem('permissions')
+            localStorage.removeItem('token')
+            return '/login'
         }
+    } else {
+        const savedPermissions = localStorage.getItem('permissions')
+        permissions = savedPermissions ? JSON.parse(savedPermissions) : []
     }
 
+    const requiredPermission = to.meta.permission
 
-    // 其他情况正常进入
+    if (requiredPermission && !permissions.includes(requiredPermission)) {
+        return '/home'
+    }
+
     return true
 })
 

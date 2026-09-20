@@ -96,8 +96,12 @@ const { departments } = storeToRefs(departmentStore)
 const showForm = ref(false)
 const showEditForm = ref(false)
 onMounted(async () => {
-    await employeeStore.loadEmployees()
-    await departmentStore.loadDepartments()
+    try {
+        await employeeStore.loadEmployees()
+        await departmentStore.loadDepartments()
+    } catch (err) {
+        console.error('页面数据加载失败', err)
+    }
 })
 const editEmployeeData = ref({
     id: null,

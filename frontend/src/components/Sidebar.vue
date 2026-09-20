@@ -101,7 +101,7 @@ const menus = [
         name: '权限管理',
         path: '/authority',
         icon: Lock,
-        permission: 'authority'
+        permission: 'permission'
     },
     {
         name: '系统管理',
