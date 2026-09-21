@@ -44,7 +44,7 @@ export const useLoginStore = defineStore('login', () => {
                     password
                 }
             )
-
+            // 把后端返回的数据放到pinia
             user.value = res.data.user
             permissions.value = res.data.permissions
             token.value = res.data.token

@@ -12,6 +12,7 @@ const request =axios.create({
 
 // 加入请求拦截器
 request.interceptors.request.use(
+    // 在每次发送请求之前向请求头发送token信息
     config=>{
         const token= localStorage.getItem('token')
 
@@ -27,6 +28,7 @@ request.interceptors.request.use(
     }
 )
 
+// 响应拦截器
 request.interceptors.response.use(
     response => response,
     error => {

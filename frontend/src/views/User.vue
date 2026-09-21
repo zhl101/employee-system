@@ -1,5 +1,5 @@
 <template>
-  <h2>这里是用户管理页面</h2>
+  <h2>用户管理页面</h2>
 
   <el-button type="primary" @click="openAddUserForm">新增用户</el-button>
 
@@ -40,7 +40,7 @@
   <el-table :data="users">
     <el-table-column prop="id" label="ID" />
     <el-table-column prop="username" label="用户名" />
-    <el-table-column prop="role_id" label="用户角色" />
+    <el-table-column prop="role_name" label="用户角色" />
     <el-table-column>
       <template #default="scope">
         <el-button type="danger" @click="deleteButton(scope.row.id)">删除用户</el-button>
@@ -127,8 +127,11 @@ const deleteButton = async (id) => {
     // 用户确定删除
     await userStore.deleteUser(id)
 
+    
+
   } catch (err) {
     console.error('删除用户失败', err)
+     
   }
 }
 onMounted(() => {
